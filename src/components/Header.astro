@@ -23,11 +23,11 @@ const isActive = (path: string) => {
 };
 ---
 
-<header>
+<header class="sticky top-0 z-40 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl transition-all duration-300">
   <a
     id="skip-to-content"
     href="#main-content"
-    class="absolute -top-full left-16 z-50 bg-background px-3 py-2 text-accent backdrop-blur-lg transition-all focus:top-4"
+    class="absolute -top-full left-16 z-50 rounded-lg bg-background px-4 py-2 text-accent shadow-lg backdrop-blur-lg ring-2 ring-accent/20 transition-all duration-300 focus:top-4"
   >
     Skip to content
   </a>
@@ -37,35 +37,38 @@ const isActive = (path: string) => {
   >
     <div
       id="top-nav-wrap"
-      class="relative flex w-full items-baseline justify-between bg-background p-4 sm:items-center sm:py-6"
+      class="relative flex w-full items-baseline justify-between p-4 sm:items-center sm:py-6"
     >
       <a
         href="/"
-        class="absolute py-1 text-2xl leading-7 font-semibold whitespace-nowrap sm:static"
+        class="group relative py-1 text-2xl font-bold leading-7 text-foreground transition-all duration-300 hover:text-accent sm:static"
       >
-        {SITE.title}
+        <span class="bg-gradient-to-r from-accent to-accent/80 bg-clip-text text-transparent">
+          {SITE.title}
+        </span>
+        <div class="absolute -inset-1 rounded-lg bg-gradient-to-r from-accent/20 to-transparent opacity-0 blur transition-opacity duration-300 group-hover:opacity-100"></div>
       </a>
       <nav
         id="nav-menu"
-        class="flex w-full flex-col items-center sm:ml-2 sm:flex-row sm:justify-end sm:space-x-4 sm:py-0"
+        class="flex w-full flex-col items-center sm:ml-2 sm:flex-row sm:justify-end sm:space-x-6 sm:py-0"
       >
         <button
           id="menu-btn"
-          class="focus-outline self-end p-2 sm:hidden"
+          class="focus-outline group relative self-end overflow-hidden rounded-lg bg-muted/50 p-2 backdrop-blur-sm transition-all duration-300 hover:bg-accent/10 hover:scale-105 active:scale-95 sm:hidden"
           aria-label="Open Menu"
           aria-expanded="false"
           aria-controls="menu-items"
         >
-          <IconX id="close-icon" class="hidden" />
-          <IconMenuDeep id="menu-icon" />
+          <IconX id="close-icon" class="hidden h-6 w-6 transition-transform duration-300" />
+          <IconMenuDeep id="menu-icon" class="h-6 w-6 transition-transform duration-300" />
         </button>
         <ul
           id="menu-items"
           class:list={[
-            "mt-4 grid w-44 grid-cols-2 place-content-center gap-2",
-            "[&>li>a]:block [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium [&>li>a]:hover:text-accent sm:[&>li>a]:px-2 sm:[&>li>a]:py-1",
-            "hidden",
-            "sm:mt-0 sm:ml-0 sm:flex sm:w-auto sm:gap-x-5 sm:gap-y-0",
+            "mt-6 grid w-52 grid-cols-2 place-content-center gap-3 rounded-xl border border-border/50 bg-background/90 p-4 backdrop-blur-xl shadow-xl",
+            "[&>li>a]:block [&>li>a]:rounded-lg [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium [&>li>a]:transition-all [&>li>a]:duration-300 [&>li>a]:hover:bg-accent/10 [&>li>a]:hover:text-accent [&>li>a]:hover:scale-105 [&>li>a]:active:scale-95 sm:[&>li>a]:px-3 sm:[&>li>a]:py-2",
+            "hidden transform opacity-0 scale-95 transition-all duration-300",
+            "sm:mt-0 sm:ml-0 sm:flex sm:w-auto sm:gap-x-6 sm:gap-y-0 sm:border-none sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-none sm:opacity-100 sm:scale-100",
           ]}
         >
           <li class="col-span-2">
@@ -89,9 +92,9 @@ const isActive = (path: string) => {
                 <LinkButton
                   href="/archives"
                   class:list={[
-                    "focus-outline flex justify-center p-3 sm:p-1",
+                    "focus-outline flex justify-center rounded-lg p-3 transition-all duration-300 hover:bg-accent/10 hover:scale-105 active:scale-95 sm:p-2",
                     {
-                      "active-nav [&>svg]:stroke-accent": isActive("/archives"),
+                      "active-nav [&>svg]:stroke-accent bg-accent/20": isActive("/archives"),
                     },
                   ]}
                   ariaLabel="archives"
@@ -107,13 +110,13 @@ const isActive = (path: string) => {
             <LinkButton
               href="/search"
               class:list={[
-                "focus-outline flex p-3 sm:p-1",
-                { "[&>svg]:stroke-accent": isActive("/search") },
+                "focus-outline group relative flex overflow-hidden rounded-lg p-3 transition-all duration-300 hover:bg-accent/10 hover:scale-105 active:scale-95 sm:p-2",
+                { "[&>svg]:stroke-accent bg-accent/20": isActive("/search") },
               ]}
               ariaLabel="search"
               title="Search"
             >
-              <IconSearch />
+              <IconSearch class="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
               <span class="sr-only">Search</span>
             </LinkButton>
           </li>
@@ -122,13 +125,13 @@ const isActive = (path: string) => {
               <li class="col-span-1 flex items-center justify-center">
                 <button
                   id="theme-btn"
-                  class="focus-outline relative size-12 p-4 sm:size-8 hover:[&>svg]:stroke-accent"
+                  class="focus-outline group relative size-12 overflow-hidden rounded-lg bg-muted/50 p-3 backdrop-blur-sm transition-all duration-300 hover:bg-accent/10 hover:scale-105 hover:[&>svg]:stroke-accent active:scale-95 sm:size-10 sm:p-2"
                   title="Toggles light & dark"
                   aria-label="auto"
                   aria-live="polite"
                 >
-                  <IconMoon class="absolute top-[50%] left-[50%] -translate-[50%] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-                  <IconSunHigh class="absolute top-[50%] left-[50%] -translate-[50%] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+                  <IconMoon class="absolute top-1/2 left-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 scale-100 rotate-0 transition-all duration-500 dark:scale-0 dark:-rotate-90" />
+                  <IconSunHigh class="absolute top-1/2 left-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 scale-0 rotate-90 transition-all duration-500 dark:scale-100 dark:rotate-0" />
                 </button>
               </li>
             )
@@ -140,12 +143,56 @@ const isActive = (path: string) => {
   <Hr />
 </header>
 
+<style>
+  /* Enhanced mobile menu animations */
+  #menu-items {
+    transform-origin: top center;
+  }
+  
+  /* Smooth gradient animation for site title */
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  /* Enhanced active navigation styles */
+  .active-nav {
+    position: relative;
+    background: linear-gradient(135deg, var(--color-accent)/0.15, var(--color-accent)/0.05);
+    border-radius: 0.5rem;
+  }
+  
+  .active-nav::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 0.5rem;
+    background: linear-gradient(135deg, var(--color-accent)/0.3, transparent);
+    opacity: 0.5;
+    z-index: -1;
+  }
+  
+  /* Enhanced hover effects for navigation */
+  nav a:hover {
+    transform: translateY(-1px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Improved focus styles */
+  .focus-outline:focus-visible {
+    outline: 2px dashed var(--color-accent);
+    outline-offset: 4px;
+    box-shadow: 0 0 0 4px var(--color-accent)/0.2;
+  }
+</style>
+
 <script>
   function toggleNav() {
-    const menuBtn = document.querySelector("#menu-btn");
-    const menuItems = document.querySelector("#menu-items");
-    const menuIcon = document.querySelector("#menu-icon");
-    const closeIcon = document.querySelector("#close-icon");
+    const menuBtn = document.querySelector("#menu-btn") as HTMLButtonElement;
+    const menuItems = document.querySelector("#menu-items") as HTMLElement;
+    const menuIcon = document.querySelector("#menu-icon") as HTMLElement;
+    const closeIcon = document.querySelector("#close-icon") as HTMLElement;
 
     if (!menuBtn || !menuItems || !menuIcon || !closeIcon) return;
 
@@ -155,9 +202,53 @@ const isActive = (path: string) => {
       menuBtn.setAttribute("aria-expanded", openMenu ? "false" : "true");
       menuBtn.setAttribute("aria-label", openMenu ? "Open Menu" : "Close Menu");
 
-      menuItems.classList.toggle("hidden");
+      if (openMenu) {
+        // Closing menu
+        menuItems.classList.add("opacity-0", "scale-95");
+        menuItems.classList.remove("opacity-100", "scale-100");
+        setTimeout(() => {
+          menuItems.classList.add("hidden");
+        }, 150);
+      } else {
+        // Opening menu
+        menuItems.classList.remove("hidden");
+        setTimeout(() => {
+          menuItems.classList.remove("opacity-0", "scale-95");
+          menuItems.classList.add("opacity-100", "scale-100");
+        }, 10);
+      }
+
+      // Toggle icons with rotation
       menuIcon.classList.toggle("hidden");
       closeIcon.classList.toggle("hidden");
+      
+      if (!openMenu) {
+        (menuIcon as HTMLElement).style.transform = "rotate(180deg)";
+        setTimeout(() => {
+          (menuIcon as HTMLElement).style.transform = "rotate(0deg)";
+        }, 150);
+      }
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      if (!menuBtn.contains(target) && !menuItems.contains(target)) {
+        const isOpen = menuBtn.getAttribute("aria-expanded") === "true";
+        if (isOpen) {
+          menuBtn.click();
+        }
+      }
+    });
+
+    // Close menu on escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        const isOpen = menuBtn.getAttribute("aria-expanded") === "true";
+        if (isOpen) {
+          menuBtn.click();
+        }
+      }
     });
   }
 
@@ -165,4 +256,25 @@ const isActive = (path: string) => {
 
   // Runs on view transitions navigation
   document.addEventListener("astro:after-swap", toggleNav);
+
+  // Add scroll effect to header
+  function addScrollEffect() {
+    const header = document.querySelector("header") as HTMLElement;
+    if (!header) return;
+
+    window.addEventListener("scroll", () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > 100) {
+        header.classList.add("shadow-lg");
+        header.style.backgroundColor = "var(--color-background)";
+      } else {
+        header.classList.remove("shadow-lg");
+        header.style.backgroundColor = "var(--color-background)/0.8";
+      }
+    });
+  }
+
+  addScrollEffect();
+  document.addEventListener("astro:after-swap", addScrollEffect);
 </script>

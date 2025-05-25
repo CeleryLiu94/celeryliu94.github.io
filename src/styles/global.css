@@ -55,5 +55,15 @@ html[data-theme="dark"] {
 }
 
 .active-nav {
-  @apply underline decoration-wavy decoration-2 underline-offset-4;
+  @apply relative bg-gradient-to-r from-accent/20 to-accent/10 text-accent underline decoration-wavy decoration-2 underline-offset-4;
+}
+
+.active-nav::before {
+  content: '';
+  @apply absolute -inset-1 rounded-lg bg-gradient-to-r from-accent/10 to-transparent opacity-50 blur-sm;
+}
+
+/* Enhanced focus styles */
+.focus-outline:focus-visible {
+  @apply outline-2 outline-dashed outline-accent/75 outline-offset-2 ring-2 ring-accent/20;
 }
