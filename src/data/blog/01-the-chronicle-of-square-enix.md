@@ -24,7 +24,8 @@ Long before they became one, Square and Enix carved out distinct, powerful legac
 
 #### Square Co., Ltd.: A Vision for Collaborative Creation
 
-_(Image: Early Square Logo - Example: 1987 "THEfillRect" or the later "Squaresoft" logo with the red triangle)_
+![Early Square Logo](../../assets/images/01/EarlySquareLogo.png)
+_Early Square Logo_
 
 Founded in September 1983 as a computer game software division of Den-Yu-Sha, an electrical power construction company owned by Kuniichi Miyamoto, **Square Co., Ltd.** was the brainchild of his son, **Masafumi Miyamoto**. Uninterested in the family's primary business, Masafumi envisioned a new way to create video games. At a time when many Japanese games were developed by solo programmers, Miyamoto championed a collaborative, team-based approach, bringing together specialized graphic designers, programmers, and story writers. This philosophy was embedded in the company's name, "Square," referencing both a "town square" for cooperative creation and a golfing term for confronting challenges directly.
 
