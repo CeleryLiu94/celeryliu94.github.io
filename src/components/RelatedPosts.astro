@@ -1,0 +1,88 @@
+---
+import Card from "@/components/Card.astro";
+import type { CollectionEntry } from "astro:content";
+
+export interface Props {
+  currentPost: CollectionEntry<"blog">;
+  allPosts: CollectionEntry<"blog">[];
+  maxRelated?: number;
+}
+
+const { currentPost, allPosts, maxRelated = 3 } = Astro.props;
+
+// Function to calculate similarity between posts based on tags
+function calculateSimilarity(post1: CollectionEntry<"blog">, post2: CollectionEntry<"blog">): number {
+  const tags1 = new Set(post1.data.tags || []);
+  const tags2 = new Set(post2.data.tags || []);
+  
+  const intersection = new Set([...tags1].filter(x => tags2.has(x)));
+  const union = new Set([...tags1, ...tags2]);
+  
+  return intersection.size / union.size; // Jaccard similarity
+}
+
+// Get related posts
+const relatedPosts = allPosts
+  .filter(post => post.id !== currentPost.id) // Exclude current post
+  .map(post => ({
+    post,
+    similarity: calculateSimilarity(currentPost, post)
+  }))
+  .filter(({ similarity }) => similarity > 0) // Only posts with shared tags
+  .sort((a, b) => b.similarity - a.similarity) // Sort by similarity
+  .slice(0, maxRelated) // Limit to maxRelated posts
+  .map(({ post }) => post);
+
+// If not enough related posts by tags, fill with recent posts
+const recentPosts = allPosts
+  .filter(post => 
+    post.id !== currentPost.id && 
+    !relatedPosts.some(related => related.id === post.id)
+  )
+  .sort((a, b) => 
+    new Date(b.data.modDatetime || b.data.pubDatetime).getTime() - 
+    new Date(a.data.modDatetime || a.data.pubDatetime).getTime()
+  )
+  .slice(0, maxRelated - relatedPosts.length);
+
+const finalRelatedPosts = [...relatedPosts, ...recentPosts];
+---
+
+{finalRelatedPosts.length > 0 && (
+  <section class="related-posts mt-12">
+    <div class="rounded-xl border border-border bg-background/50 p-6 backdrop-blur-sm">
+      <h3 class="mb-6 text-xl font-semibold text-accent">
+        {relatedPosts.length > 0 ? "Related Articles" : "Recent Articles"}
+      </h3>      <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {finalRelatedPosts.map(post => (
+          <Card 
+            {...post}
+            variant="h3"
+          />
+        ))}
+      </ul>
+      
+      <div class="mt-6 text-center">
+        <a 
+          href="/posts"
+          class="inline-flex items-center gap-2 rounded-lg bg-accent/10 px-4 py-2 text-accent transition-all hover:bg-accent/20"
+        >
+          <span>View All Posts</span>
+          <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .related-posts .group:hover {
+    transform: translateY(-2px);
+  }
+  
+  .related-posts .group {
+    transition: transform 0.3s ease;
+  }
+</style>

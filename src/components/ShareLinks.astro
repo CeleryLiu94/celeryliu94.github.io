@@ -5,22 +5,80 @@ import LinkButton from "./LinkButton.astro";
 const URL = Astro.url;
 ---
 
-<div
-  class="flex flex-col flex-wrap items-center justify-center gap-1 sm:items-start"
->
-  <span class="italic">Share this post on:</span>
-  <div class="text-center">
+<div class="share-section rounded-xl border border-border bg-background/50 p-6 backdrop-blur-sm">
+  <h3 class="mb-4 text-lg font-semibold text-accent">Share this article</h3>
+  <div class="flex flex-wrap items-center justify-center gap-3 sm:justify-start">
     {
       SHARE_LINKS.map(social => (
         <LinkButton
           href={`${social.href + URL}`}
-          class="scale-90 p-2 hover:rotate-6 sm:p-1"
+          class="group flex items-center gap-2 rounded-lg border border-border bg-background/70 px-4 py-2 transition-all hover:border-accent/50 hover:bg-accent/10 hover:scale-105 active:scale-95"
           title={social.linkTitle}
         >
-          <social.icon class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110" />
-          <span class="sr-only">{social.linkTitle}</span>
+          <social.icon class="size-5 fill-transparent stroke-current stroke-2 opacity-80 group-hover:opacity-100 group-hover:stroke-accent transition-all" />
+          <span class="text-sm font-medium opacity-80 group-hover:opacity-100 group-hover:text-accent transition-all sm:inline hidden">
+            {social.linkTitle.replace('Share on ', '')}
+          </span>
         </LinkButton>
       ))
     }
+    
+    <!-- Copy URL Button -->
+    <button
+      id="copy-url-btn"
+      class="group flex items-center gap-2 rounded-lg border border-border bg-background/70 px-4 py-2 transition-all hover:border-accent/50 hover:bg-accent/10 hover:scale-105 active:scale-95"
+      title="Copy URL"
+    >
+      <svg class="size-5 stroke-current stroke-2 opacity-80 group-hover:opacity-100 group-hover:stroke-accent transition-all" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+      </svg>
+      <span class="text-sm font-medium opacity-80 group-hover:opacity-100 group-hover:text-accent transition-all sm:inline hidden">
+        Copy Link
+      </span>
+    </button>
   </div>
 </div>
+
+<script>
+  function initCopyUrlButton() {
+    const copyUrlBtn = document.getElementById('copy-url-btn');
+    
+    if (copyUrlBtn) {
+      copyUrlBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          
+          // Update button text to show success
+          const span = copyUrlBtn.querySelector('span');
+          if (span) {
+            const originalText = span.textContent;
+            span.textContent = 'Copied!';
+            copyUrlBtn.classList.add('text-accent', 'border-accent');
+            
+            setTimeout(() => {
+              span.textContent = originalText;
+              copyUrlBtn.classList.remove('text-accent', 'border-accent');
+            }, 2000);
+          }
+        } catch {
+          // Fallback for browsers that don't support clipboard API
+          const span = copyUrlBtn.querySelector('span');
+          if (span) {
+            const originalText = span.textContent;
+            span.textContent = 'Failed';
+            
+            setTimeout(() => {
+              span.textContent = originalText;
+            }, 2000);
+          }
+        }
+      });
+    }
+  }
+  
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', initCopyUrlButton);
+  
+  // Re-initialize on Astro page transitions
+  document.addEventListener('astro:after-swap', initCopyUrlButton);
+</script>

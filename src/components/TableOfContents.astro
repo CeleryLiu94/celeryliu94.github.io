@@ -1,0 +1,120 @@
+---
+export interface Props {
+  headings: { depth: number; slug: string; text: string }[];
+}
+
+const { headings } = Astro.props;
+
+// Filter headings to only include h2 and h3 for better TOC
+const tocHeadings = headings.filter(h => h.depth <= 3);
+---
+
+{tocHeadings.length > 0 && (
+  <nav class="toc-container sticky top-24 mb-8 rounded-xl border border-border bg-background/80 p-4 backdrop-blur-sm">
+    <h2 class="mb-3 text-lg font-semibold text-accent">Table of Contents</h2>
+    <ul class="space-y-1">
+      {tocHeadings.map(heading => (
+        <li class={`toc-item toc-level-${heading.depth}`}>
+          <a 
+            href={`#${heading.slug}`}
+            class="block py-1 text-sm text-foreground/80 transition-colors hover:text-accent focus:text-accent"
+            style={`padding-left: ${(heading.depth - 2) * 0.75}rem`}
+          >
+            {heading.text}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
+
+<style>
+  .toc-container {
+    max-height: 60vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-muted) transparent;
+  }
+  
+  .toc-container::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .toc-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .toc-container::-webkit-scrollbar-thumb {
+    background: var(--color-muted);
+    border-radius: 2px;
+  }
+  
+  .toc-item a {
+    border-left: 2px solid transparent;
+    margin-left: -2px;
+    padding-left: calc(0.5rem + 2px);
+  }
+  
+  .toc-item a.active {
+    border-left-color: var(--color-accent);
+    color: var(--color-accent);
+    background: var(--color-accent) / 0.1;
+  }
+</style>
+
+<script>
+  function initTOC() {
+    const tocLinks = document.querySelectorAll('.toc-item a');
+    const headings = document.querySelectorAll('h2, h3, h4, h5, h6');
+    
+    // Intersection Observer for highlighting current section
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          const id = entry.target.getAttribute('id');
+          const tocLink = document.querySelector(`.toc-item a[href="#${id}"]`);
+          
+          if (entry.isIntersecting) {
+            // Remove active class from all links
+            tocLinks.forEach(link => link.classList.remove('active'));
+            // Add active class to current link
+            tocLink?.classList.add('active');
+          }
+        });
+      },
+      {
+        rootMargin: '-20% 0px -70% 0px',
+        threshold: 0
+      }
+    );
+    
+    // Observe all headings
+    headings.forEach(heading => {
+      if (heading.id) {
+        observer.observe(heading);
+      }
+    });
+    
+    // Smooth scroll for TOC links
+    tocLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href')?.substring(1);
+        const targetElement = document.getElementById(targetId || '');
+        
+        if (targetElement) {
+          targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+  }
+  
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', initTOC);
+  
+  // Re-initialize on Astro page transitions
+  document.addEventListener('astro:after-swap', initTOC);
+</script>

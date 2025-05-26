@@ -4,12 +4,16 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Tag from "@/components/Tag.astro";
-import Datetime from "@/components/Datetime.astro";
-import EditPost from "@/components/EditPost.astro";
+import ArticleMeta from "@/components/ArticleMeta.astro";
 import ShareLinks from "@/components/ShareLinks.astro";
 import BackButton from "@/components/BackButton.astro";
+import TableOfContents from "@/components/TableOfContents.astro";
+import ArticleBreadcrumb from "@/components/ArticleBreadcrumb.astro";
+import RelatedPosts from "@/components/RelatedPosts.astro";
+import EnhancedCodeBlock from "@/components/EnhancedCodeBlock.astro";
 import { getPath } from "@/utils/getPath";
 import { slugifyStr } from "@/utils/slugify";
+import { getReadingTime } from "@/utils/readingTime";
 import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
 import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
 import { SITE } from "@/config";
@@ -29,12 +33,14 @@ const {
   canonicalURL,
   pubDatetime,
   modDatetime,
-  timezone,
   tags,
   hideEditPost,
 } = post.data;
 
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
+
+// Calculate reading time
+const readingTimeInfo = getReadingTime(post.body || "");
 
 let ogImageUrl: string | undefined;
 
@@ -91,116 +97,161 @@ const nextPost =
     ]}
     data-pagefind-body
   >
-    <h1
-      transition:name={slugifyStr(title)}
-      class="inline-block text-2xl font-bold text-accent sm:text-3xl"
-    >
-      {title}
-    </h1>
-    <div class="flex items-center gap-4">
-      <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" class="my-2" />
-      <EditPost class="max-sm:hidden" {hideEditPost} {post} />
-    </div>
-    <article id="article" class="mx-auto prose mt-8 max-w-4xl">
-      <Content />
-    </article>
-
-    <hr class="my-8 border-dashed" />
-
-    <EditPost class="sm:hidden" {hideEditPost} {post} />
-
-    <ul class="mt-4 mb-8 sm:my-8">
-      {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} />)}
-    </ul>
-
-    <div
-      class="flex flex-col items-center justify-between gap-6 sm:flex-row sm:items-end sm:gap-4"
-    >
-      <ShareLinks />
-
-      <button
-        id="back-to-top"
-        class="focus-outline py-1 whitespace-nowrap hover:opacity-75"
+    <!-- Breadcrumb Navigation -->
+    <ArticleBreadcrumb {post} />
+    
+    <!-- Article Header -->
+    <header class="article-header mb-8">
+      <h1
+        transition:name={slugifyStr(title)}
+        class="mb-6 text-3xl font-bold leading-tight text-accent sm:text-4xl lg:text-5xl"
       >
-        <IconChevronLeft class="inline-block rotate-90" />
-        <span>Back to Top</span>
-      </button>
+        {title}
+      </h1>
+      
+      <ArticleMeta 
+        {post} 
+        readingTime={readingTimeInfo.readingTimeText}
+        wordCount={readingTimeInfo.wordCount}
+        {hideEditPost}
+      />
+    </header>
+
+    <!-- Article Content with TOC -->
+    <div class="article-layout lg:grid lg:grid-cols-4 lg:gap-8">
+      <!-- Table of Contents (Desktop) -->
+      <aside class="hidden lg:block">
+        <TableOfContents {headings} />
+      </aside>
+      
+      <!-- Main Article Content -->
+      <div class="lg:col-span-3">
+        <!-- Mobile TOC -->
+        <div class="mb-8 lg:hidden">
+          <TableOfContents {headings} />
+        </div>
+        
+        <article id="article" class="prose prose-lg mx-auto max-w-none">
+          <Content />
+        </article>
+      </div>
     </div>
 
-    <hr class="my-6 border-dashed" />
+    <!-- Article Footer -->
+    <footer class="article-footer mt-12">
+      <hr class="my-8 border-dashed" />
 
-    <!-- Previous/Next Post Buttons -->
-    <div data-pagefind-ignore class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-      {
-        prevPost && (
-          <a
-            href={`/posts/${prevPost.slug}`}
-            class="flex w-full gap-1 hover:opacity-75"
-          >
-            <IconChevronLeft class="inline-block flex-none" />
-            <div>
-              <span>Previous Post</span>
-              <div class="text-sm text-accent/85">{prevPost.title}</div>
-            </div>
-          </a>
-        )
-      }
-      {
-        nextPost && (
-          <a
-            href={`/posts/${nextPost.slug}`}
-            class="flex w-full justify-end gap-1 text-right hover:opacity-75 sm:col-start-2"
-          >
-            <div>
-              <span>Next Post</span>
-              <div class="text-sm text-accent/85">{nextPost.title}</div>
-            </div>
-            <IconChevronRight class="inline-block flex-none" />
-          </a>
-        )
-      }
-    </div>
+      <!-- Tags -->
+      <div class="mb-8">
+        <h3 class="mb-4 text-lg font-semibold">Tags</h3>
+        <ul class="flex flex-wrap gap-2">
+          {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} />)}
+        </ul>
+      </div>
+
+      <!-- Share and Back to Top -->
+      <div
+        class="flex flex-col items-center justify-between gap-6 sm:flex-row sm:items-end sm:gap-4"
+      >
+        <ShareLinks />
+
+        <button
+          id="back-to-top"
+          class="focus-outline group inline-flex items-center gap-2 rounded-lg bg-muted/50 px-4 py-2 backdrop-blur-sm transition-all hover:bg-accent/10 hover:opacity-75"
+        >
+          <IconChevronLeft class="rotate-90 transition-transform group-hover:-translate-y-1" />
+          <span>Back to Top</span>
+        </button>
+      </div>
+
+      <hr class="my-8 border-dashed" />
+
+      <!-- Previous/Next Post Navigation -->
+      <nav class="post-navigation" data-pagefind-ignore>
+        <h3 class="mb-6 text-lg font-semibold">Continue Reading</h3>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          {
+            prevPost && (
+              <a
+                href={`/posts/${prevPost.slug}`}
+                class="group flex gap-3 rounded-xl border border-border bg-background/50 p-6 transition-all hover:border-accent/50 hover:bg-accent/5"
+              >
+                <IconChevronLeft class="mt-1 flex-none text-accent" />
+                <div>
+                  <div class="text-sm font-medium text-accent/80">Previous Post</div>
+                  <div class="mt-1 font-semibold group-hover:text-accent">{prevPost.title}</div>
+                </div>
+              </a>
+            )
+          }
+          {
+            nextPost && (
+              <a
+                href={`/posts/${nextPost.slug}`}
+                class="group flex justify-end gap-3 rounded-xl border border-border bg-background/50 p-6 text-right transition-all hover:border-accent/50 hover:bg-accent/5 sm:col-start-2"
+              >
+                <div>
+                  <div class="text-sm font-medium text-accent/80">Next Post</div>
+                  <div class="mt-1 font-semibold group-hover:text-accent">{nextPost.title}</div>
+                </div>
+                <IconChevronRight class="mt-1 flex-none text-accent" />
+              </a>
+            )
+          }
+        </div>
+      </nav>
+      
+      <!-- Related Posts -->
+      <RelatedPosts currentPost={post} allPosts={posts} />
+    </footer>
   </main>
   <Footer />
 </Layout>
 
+<!-- Enhanced Code Block Styles -->
+<EnhancedCodeBlock />
+
 <script is:inline data-astro-rerun>
-  /** Create a progress indicator
-   *  at the top */
+  /** Create a progress indicator at the top */
   function createProgressBar() {
     // Create the main container div
     const progressContainer = document.createElement("div");
     progressContainer.className =
-      "progress-container fixed top-0 z-10 h-1 w-full bg-background";
+      "progress-container fixed top-0 z-50 h-1 w-full bg-background";
 
     // Create the progress bar div
     const progressBar = document.createElement("div");
-    progressBar.className = "progress-bar h-1 w-0 bg-accent";
+    progressBar.className = "progress-bar h-1 w-0 bg-gradient-to-r from-accent to-accent/70 transition-all duration-150";
     progressBar.id = "myBar";
 
     // Append the progress bar to the progress container
     progressContainer.appendChild(progressBar);
 
-    // Append the progress container to the document body or any other desired parent element
+    // Append the progress container to the document body
     document.body.appendChild(progressContainer);
   }
   createProgressBar();
 
-  /** Update the progress bar
-   *  when user scrolls */
+  /** Update the progress bar when user scrolls */
   function updateScrollProgress() {
-    document.addEventListener("scroll", () => {
-      const winScroll =
-        document.body.scrollTop || document.documentElement.scrollTop;
-      const height =
-        document.documentElement.scrollHeight -
-        document.documentElement.clientHeight;
+    let ticking = false;
+    
+    function updateProgress() {
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
       const scrolled = (winScroll / height) * 100;
-      if (document) {
-        const myBar = document.getElementById("myBar");
-        if (myBar) {
-          myBar.style.width = scrolled + "%";
-        }
+      
+      const myBar = document.getElementById("myBar");
+      if (myBar) {
+        myBar.style.width = scrolled + "%";
+      }
+      ticking = false;
+    }
+    
+    document.addEventListener("scroll", () => {
+      if (!ticking) {
+        requestAnimationFrame(updateProgress);
+        ticking = true;
       }
     });
   }
@@ -228,10 +279,10 @@ const nextPost =
   }
   addHeadingLinks();
 
-  /** Attaches copy buttons to code blocks in the document,
-   * allowing users to copy code easily. */
+  /** Attaches copy buttons to code blocks in the document */
   function attachCopyButtons() {
     const copyButtonLabel = "Copy";
+    const copiedLabel = "Copied!";
     const codeBlocks = Array.from(document.querySelectorAll("pre"));
 
     for (const codeBlock of codeBlocks) {
@@ -240,12 +291,14 @@ const nextPost =
 
       const copyButton = document.createElement("button");
       copyButton.className =
-        "copy-code absolute right-3 -top-3 rounded bg-muted px-2 py-1 text-xs leading-4 text-foreground font-medium";
+        "copy-code absolute right-3 -top-3 rounded-lg bg-muted/90 px-3 py-1.5 text-xs font-medium text-foreground backdrop-blur-sm transition-all hover:bg-accent hover:text-background focus:outline-none focus:ring-2 focus:ring-accent/50";
       copyButton.innerHTML = copyButtonLabel;
+      copyButton.setAttribute("aria-label", "Copy code to clipboard");
+      
       codeBlock.setAttribute("tabindex", "0");
       codeBlock.appendChild(copyButton);
 
-      // wrap codebock with relative parent element
+      // wrap codeblock with relative parent element
       codeBlock?.parentNode?.insertBefore(wrapper, codeBlock);
       wrapper.appendChild(codeBlock);
 
@@ -258,30 +311,153 @@ const nextPost =
       const code = block.querySelector("code");
       const text = code?.innerText;
 
-      await navigator.clipboard.writeText(text ?? "");
-
-      // visual feedback that task is completed
-      button.innerText = "Copied";
-
-      setTimeout(() => {
-        button.innerText = copyButtonLabel;
-      }, 700);
+      try {
+        await navigator.clipboard.writeText(text ?? "");
+        
+        // Visual feedback
+        button.innerText = copiedLabel;
+        button.classList.add("bg-accent", "text-background");
+        
+        setTimeout(() => {
+          button.innerText = copyButtonLabel;
+          button.classList.remove("bg-accent", "text-background");
+        }, 2000);
+      } catch {
+        // Handle copy failure silently
+        button.innerText = "Failed";
+        setTimeout(() => {
+          button.innerText = copyButtonLabel;
+        }, 2000);
+      }
     }
   }
   attachCopyButtons();
 
-  /** Scrolls the document to the top when
-   * the "Back to Top" button is clicked. */
+  /** Scrolls the document to the top when the "Back to Top" button is clicked */
   function backToTop() {
     document.querySelector("#back-to-top")?.addEventListener("click", () => {
-      document.body.scrollTop = 0; // For Safari
-      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+      window.scrollTo({ 
+        top: 0, 
+        left: 0, 
+        behavior: "smooth" 
+      });
     });
   }
   backToTop();
 
+  /** Image lazy loading and zoom functionality */
+  function enhanceImages() {
+    const images = document.querySelectorAll('article img');
+    
+    images.forEach(img => {
+      // Add lazy loading
+      img.setAttribute('loading', 'lazy');
+      
+      // Add click to zoom functionality
+      img.style.cursor = 'zoom-in';
+      img.addEventListener('click', () => {
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm';
+        overlay.style.animation = 'fadeIn 0.3s ease-out';
+        
+        const zoomedImg = img.cloneNode();
+        zoomedImg.className = 'max-w-[90vw] max-h-[90vh] object-contain';
+        zoomedImg.style.cursor = 'zoom-out';
+        
+        overlay.appendChild(zoomedImg);
+        document.body.appendChild(overlay);
+        
+        const closeOverlay = () => {
+          overlay.style.animation = 'fadeOut 0.3s ease-out';
+          setTimeout(() => document.body.removeChild(overlay), 300);
+        };
+        
+        overlay.addEventListener('click', closeOverlay);
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') closeOverlay();
+        }, { once: true });
+      });
+    });
+  }
+  enhanceImages();
+
   /* Go to page start after page swap */
-  document.addEventListener("astro:after-swap", () =>
-    window.scrollTo({ left: 0, top: 0, behavior: "instant" })
-  );
+  document.addEventListener("astro:after-swap", () => {
+    window.scrollTo({ left: 0, top: 0, behavior: "instant" });
+    enhanceImages();
+  });
 </script>
+
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  
+  .article-header {
+    background: linear-gradient(135deg, var(--color-background) 0%, var(--color-background) 100%);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 2rem;
+  }
+  
+  .article-layout {
+    min-height: 60vh;
+  }
+  
+  .prose {
+    line-height: 1.75;
+  }
+  
+  .prose h2,
+  .prose h3,
+  .prose h4,
+  .prose h5,
+  .prose h6 {
+    scroll-margin-top: 6rem;
+  }
+  
+  .post-navigation a {
+    transition: all 0.3s ease;
+  }
+  
+  .post-navigation a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--color-accent) / 0.15;
+  }
+  
+  /* Enhanced code block styles */
+  pre:has(code) {
+    background: var(--color-muted) / 0.3;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    overflow-x: auto;
+  }
+  
+  .copy-code {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  pre:hover .copy-code {
+    opacity: 1;
+  }
+  
+  /* Responsive typography */
+  @media (max-width: 768px) {
+    .prose {
+      font-size: 16px;
+    }
+    
+    .article-header h1 {
+      font-size: 2rem;
+      line-height: 1.2;
+    }
+  }
+</style>
