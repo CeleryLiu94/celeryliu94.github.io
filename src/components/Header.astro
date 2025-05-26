@@ -39,11 +39,11 @@ const isActive = (path: string) => {
   >
     <div
       id="top-nav-wrap"
-      class="relative flex w-full items-baseline justify-between p-4 sm:items-center sm:py-6"
+      class="relative flex w-full items-center justify-between p-4 sm:py-6"
     >
       <a
         href="/"
-        class="group relative py-1 text-2xl leading-7 font-bold text-foreground transition-all duration-300 hover:text-accent sm:static"
+        class="group relative flex-shrink-0 py-1 text-xl leading-7 font-bold text-foreground transition-all duration-300 hover:text-accent sm:text-2xl"
       >
         <span
           class="bg-gradient-to-r from-accent to-accent/80 bg-clip-text text-transparent"
@@ -57,7 +57,7 @@ const isActive = (path: string) => {
       </a>
       <nav
         id="nav-menu"
-        class="flex w-full flex-col items-center sm:ml-2 sm:flex-row sm:justify-end sm:space-x-6 sm:py-0"
+        class="flex w-auto flex-shrink-0 items-center sm:ml-4 sm:space-x-4"
       >
         <button
           id="menu-btn"
@@ -78,34 +78,34 @@ const isActive = (path: string) => {
         <ul
           id="menu-items"
           class:list={[
-            "mt-6 grid w-52 grid-cols-2 place-content-center gap-3 rounded-xl border border-border/50 bg-background/90 p-4 shadow-xl backdrop-blur-xl",
-            "[&>li>a]:block [&>li>a]:rounded-lg [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium [&>li>a]:transition-all [&>li>a]:duration-300 [&>li>a]:hover:scale-105 [&>li>a]:hover:bg-accent/10 [&>li>a]:hover:text-accent [&>li>a]:active:scale-95 sm:[&>li>a]:px-3 sm:[&>li>a]:py-2",
+            "mt-6 grid w-44 grid-cols-1 place-content-center gap-2 rounded-xl border border-border/50 bg-background/90 p-3 shadow-xl backdrop-blur-xl",
+            "[&>li>a]:block [&>li>a]:rounded-lg [&>li>a]:px-3 [&>li>a]:py-2 [&>li>a]:text-center [&>li>a]:text-sm [&>li>a]:font-medium [&>li>a]:transition-all [&>li>a]:duration-300 [&>li>a]:hover:scale-105 [&>li>a]:hover:bg-accent/10 [&>li>a]:hover:text-accent [&>li>a]:active:scale-95",
             "hidden scale-95 transform opacity-0 transition-all duration-300",
-            "sm:mt-0 sm:ml-0 sm:flex sm:w-auto sm:scale-100 sm:gap-x-6 sm:gap-y-0 sm:border-none sm:bg-transparent sm:p-0 sm:opacity-100 sm:shadow-none sm:backdrop-blur-none",
+            "sm:mt-0 sm:ml-0 sm:flex sm:w-auto sm:scale-100 sm:flex-row sm:gap-x-3 sm:gap-y-0 sm:border-none sm:bg-transparent sm:p-0 sm:opacity-100 sm:shadow-none sm:backdrop-blur-none",
           ]}
         >
-          <li class="col-span-2">
+          <li class="col-span-1">
             <a href="/posts" class:list={{ "active-nav": isActive("/posts") }}>
               BlueChips
             </a>
           </li>
-          <li class="col-span-2">
+          <li class="col-span-1">
             <a href="/tags" class:list={{ "active-nav": isActive("/tags") }}>
               Category
             </a>
           </li>
-          <li class="col-span-2">
+          <li class="col-span-1">
             <a href="/about" class:list={{ "active-nav": isActive("/about") }}>
               About
             </a>
           </li>
           {
             SITE.showArchives && (
-              <li class="col-span-2">
+              <li class="col-span-1">
                 <LinkButton
                   href="/archives"
                   class:list={[
-                    "focus-outline flex justify-center rounded-lg p-3 transition-all duration-300 hover:scale-105 hover:bg-accent/10 active:scale-95 sm:p-2",
+                    "focus-outline flex justify-center rounded-lg p-2 text-sm transition-all duration-300 hover:scale-105 hover:bg-accent/10 active:scale-95",
                     {
                       "active-nav bg-accent/20 [&>svg]:stroke-accent":
                         isActive("/archives"),
@@ -114,40 +114,40 @@ const isActive = (path: string) => {
                   ariaLabel="archives"
                   title="Archives"
                 >
-                  <IconArchive class="hidden sm:inline-block" />
+                  <IconArchive class="hidden sm:inline-block h-4 w-4" />
                   <span class="sm:sr-only">Archives</span>
                 </LinkButton>
               </li>
             )
           }
-          <li class="col-span-1 flex items-center justify-center">
+          <li class="col-span-1 flex items-center justify-center sm:col-span-auto">
             <LinkButton
               href="/search"
               class:list={[
-                "focus-outline group relative flex overflow-hidden rounded-lg p-3 transition-all duration-300 hover:scale-105 hover:bg-accent/10 active:scale-95 sm:p-2",
+                "focus-outline group relative flex overflow-hidden rounded-lg p-2 transition-all duration-300 hover:scale-105 hover:bg-accent/10 active:scale-95",
                 { "bg-accent/20 [&>svg]:stroke-accent": isActive("/search") },
               ]}
               ariaLabel="search"
               title="Search"
             >
               <IconSearch
-                class="h-5 w-5 transition-transform duration-300 group-hover:scale-110"
+                class="h-4 w-4 transition-transform duration-300 group-hover:scale-110"
               />
               <span class="sr-only">Search</span>
             </LinkButton>
           </li>
           {
             SITE.lightAndDarkMode && (
-              <li class="col-span-1 flex items-center justify-center">
+              <li class="col-span-1 flex items-center justify-center sm:col-span-auto">
                 <button
                   id="theme-btn"
-                  class="focus-outline group relative size-12 overflow-hidden rounded-lg bg-muted/50 p-3 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-accent/10 active:scale-95 sm:size-10 sm:p-2 hover:[&>svg]:stroke-accent"
+                  class="focus-outline group relative size-10 overflow-hidden rounded-lg bg-muted/50 p-2 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-accent/10 active:scale-95 hover:[&>svg]:stroke-accent"
                   title="Toggles light & dark"
                   aria-label="auto"
                   aria-live="polite"
                 >
-                  <IconMoon class="absolute top-1/2 left-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 scale-100 rotate-0 transition-all duration-500 dark:scale-0 dark:-rotate-90" />
-                  <IconSunHigh class="absolute top-1/2 left-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 scale-0 rotate-90 transition-all duration-500 dark:scale-100 dark:rotate-0" />
+                  <IconMoon class="absolute top-1/2 left-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 scale-100 rotate-0 transition-all duration-500 dark:scale-0 dark:-rotate-90" />
+                  <IconSunHigh class="absolute top-1/2 left-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 scale-0 rotate-90 transition-all duration-500 dark:scale-100 dark:rotate-0" />
                 </button>
               </li>
             )
